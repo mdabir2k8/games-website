@@ -307,19 +307,38 @@ function init2048(container) {
 }
 
 function initSnake(container) {
-    container.innerHTML = `<canvas id="snakeCanvas" width="360" height="360" style="background:#1a1a2e;border-radius:10px;"></canvas>`;
+    container.innerHTML = `
+        <style>
+            .snake-info { text-align: center; color: #fff; margin-bottom: 10px; }
+            .snake-score { font-size: 20px; }
+            .snake-gameover { color: #e74c3c; font-size: 18px; margin-top: 10px; display: none; }
+            .snake-restart { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        </style>
+        <div class="snake-info">
+            <div class="snake-score">Score: <span id="snakeScore">0</span></div>
+            <div class="snake-gameover" id="snakeGameOver">Game Over! Final Score: <span id="snakeFinalScore">0</span></div>
+            <button class="snake-restart" id="snakeRestart" style="display:none;">🔄 Play Again</button>
+        </div>
+        <canvas id="snakeCanvas" width="360" height="360" style="background:#1a1a2e;border-radius:10px;display:block;margin:0 auto;"></canvas>
+    `;
     
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
     const gs = 18, gc = canvas.width/gs;
-    let snake, food, dir, nextDir, loop;
+    let snake, food, dir, nextDir, loop, score, gameRunning;
     
     function reset() {
         snake = [{x:5,y:5}];
         dir = nextDir = 'right';
+        score = 0;
+        gameRunning = true;
         placeFood();
+        document.getElementById('snakeScore').textContent = '0';
+        document.getElementById('snakeGameOver').style.display = 'none';
+        document.getElementById('snakeRestart').style.display = 'none';
         if (loop) clearInterval(loop);
         loop = setInterval(update, 100);
+        draw();
     }
     
     function placeFood() {
@@ -328,6 +347,8 @@ function initSnake(container) {
     }
     
     function update() {
+        if (!gameRunning) return;
+        
         dir = nextDir;
         const head = {...snake[0]};
         if (dir==='up') head.y--;
@@ -337,11 +358,19 @@ function initSnake(container) {
         
         if (head.x<0||head.x>=gc||head.y<0||head.y>=gc||snake.some(s=>s.x===head.x&&s.y===head.y)) {
             clearInterval(loop);
+            gameRunning = false;
+            document.getElementById('snakeGameOver').style.display = 'block';
+            document.getElementById('snakeFinalScore').textContent = score;
+            document.getElementById('snakeRestart').style.display = 'inline-block';
             return;
         }
         
         snake.unshift(head);
-        if (head.x===food.x&&head.y===food.y) placeFood();
+        if (head.x===food.x&&head.y===food.y) {
+            score += 10;
+            document.getElementById('snakeScore').textContent = score;
+            placeFood();
+        }
         else snake.pop();
         
         draw();
@@ -360,13 +389,21 @@ function initSnake(container) {
         ctx.fill();
     }
     
-    const h = (e) => {
-        if (e.key==='ArrowUp'&&dir!=='down') nextDir='up';
-        if (e.key==='ArrowDown'&&dir!=='up') nextDir='down';
-        if (e.key==='ArrowLeft'&&dir!=='right') nextDir='left';
-        if (e.key==='ArrowRight'&&dir!=='left') nextDir='right';
+    // Use a namespaced handler to avoid duplicates
+    const handler = (e) => {
+        if (!gameRunning) return;
+        if (e.key==='ArrowUp'&&dir!=='down') { e.preventDefault(); nextDir='up'; }
+        if (e.key==='ArrowDown'&&dir!=='up') { e.preventDefault(); nextDir='down'; }
+        if (e.key==='ArrowLeft'&&dir!=='right') { e.preventDefault(); nextDir='left'; }
+        if (e.key==='ArrowRight'&&dir!=='left') { e.preventDefault(); nextDir='right'; }
     };
-    document.addEventListener('keydown', h);
+    
+    document.removeEventListener('keydown', window._snakeHandler);
+    window._snakeHandler = handler;
+    document.addEventListener('keydown', handler);
+    
+    document.getElementById('snakeRestart').addEventListener('click', reset);
+    
     reset();
 }
 
@@ -806,25 +843,57 @@ function initAsteroids(container) {
 }
 
 function initRacing(container) {
-    container.innerHTML = `<canvas id="raceCanvas" width="300" height="450" style="background:#333;border-radius:10px;"></canvas>`;
+    container.innerHTML = `
+        <style>
+            .race-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #fff; display: none; z-index: 10; }
+            .race-gameover { font-size: 24px; color: #e74c3c; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            .race-final-score { font-size: 18px; margin: 10px 0; }
+            .race-restart { background: #e74c3c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 15px; }
+            .race-container { position: relative; }
+        </style>
+        <div class="race-container">
+            <canvas id="raceCanvas" width="300" height="450" style="background:#333;border-radius:10px;"></canvas>
+            <div class="race-overlay" id="raceOverlay">
+                <div class="race-gameover">💥 CRASH!</div>
+                <div class="race-final-score">Score: <span id="raceFinalScore">0</span></div>
+                <button class="race-restart" id="raceRestart">🔄 Play Again</button>
+            </div>
+        </div>
+    `;
     
     const canvas = document.getElementById('raceCanvas');
     const ctx = canvas.getContext('2d');
-    let car, obstacles, score, loop;
+    let car, obstacles, score, loop, frame, gameRunning;
     
     function reset() {
         car = {x:canvas.width/2-15, y:canvas.height-60, w:30, h:50};
         obstacles = [];
         score = 0;
+        frame = 0;
+        gameRunning = true;
+        document.getElementById('raceOverlay').style.display = 'none';
+        if (loop) cancelAnimationFrame(loop);
         loop = requestAnimationFrame(game);
     }
     
     const keys = {};
-    document.addEventListener('keydown', e => { if(['ArrowLeft','ArrowRight'].includes(e.key)) { e.preventDefault(); keys[e.key]=true; }});
-    document.addEventListener('keyup', e => keys[e.key]=false);
     
-    let frame = 0;
+    const keyHandler = (e) => {
+        if(['ArrowLeft','ArrowRight'].includes(e.key)) {
+            e.preventDefault();
+            keys[e.key] = e.type === 'keydown';
+        }
+    };
+    
+    document.removeEventListener('keydown', window._raceKeyHandler);
+    document.removeEventListener('keyup', window._raceKeyHandler);
+    window._raceKeyHandler = keyHandler;
+    document.addEventListener('keydown', keyHandler);
+    document.addEventListener('keyup', keyHandler);
+    
     function game() {
+        if (!gameRunning) return;
+        
         frame++;
         score++;
         
@@ -838,14 +907,24 @@ function initRacing(container) {
         obstacles.forEach(o => o.y += 4);
         obstacles = obstacles.filter(o => o.y < canvas.height);
         
-        obstacles.forEach(o => {
+        // Check collision
+        let crashed = false;
+        for (let o of obstacles) {
             if (car.x < o.x+o.w && car.x+car.w > o.x && car.y < o.y+o.h && car.y+car.h > o.y) {
-                cancelAnimationFrame(loop);
-                alert('Crash! Score: ' + score);
-                return;
+                crashed = true;
+                break;
             }
-        });
+        }
         
+        if (crashed) {
+            gameRunning = false;
+            document.getElementById('raceFinalScore').textContent = score;
+            document.getElementById('raceOverlay').style.display = 'block';
+            cancelAnimationFrame(loop);
+            return;
+        }
+        
+        // Draw
         ctx.fillStyle = '#333';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
@@ -867,6 +946,7 @@ function initRacing(container) {
         loop = requestAnimationFrame(game);
     }
     
+    document.getElementById('raceRestart').addEventListener('click', reset);
     reset();
 }
 
@@ -916,24 +996,56 @@ function initBasketball(container) {
 }
 
 function initSoccer(container) {
-    container.innerHTML = `<canvas id="soccerCanvas" width="400" height="300" style="background:#27ae60;border-radius:10px;"></canvas>`;
+    container.innerHTML = `
+        <style>
+            .soccer-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #fff; display: none; z-index: 10; }
+            .soccer-gameover { font-size: 24px; color: #e74c3c; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            .soccer-final-score { font-size: 18px; margin: 10px 0; }
+            .soccer-restart { background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 15px; }
+            .soccer-container { position: relative; }
+        </style>
+        <div class="soccer-container">
+            <canvas id="soccerCanvas" width="400" height="300" style="background:#27ae60;border-radius:10px;"></canvas>
+            <div class="soccer-overlay" id="soccerOverlay">
+                <div class="soccer-gameover">⚽ Game Over!</div>
+                <div class="soccer-final-score">Score: <span id="soccerFinalScore">0</span></div>
+                <button class="soccer-restart" id="soccerRestart">🔄 Play Again</button>
+            </div>
+        </div>
+    `;
     
     const canvas = document.getElementById('soccerCanvas');
     const ctx = canvas.getContext('2d');
-    let player, ball, score, loop;
+    let player, ball, score, loop, gameRunning;
     
     function reset() {
         player = {x:canvas.width/2, y:canvas.height-40, r:15};
         ball = {x:canvas.width/2, y:canvas.height/2, vx:0, vy:-3, r:10};
         score = 0;
+        gameRunning = true;
+        document.getElementById('soccerOverlay').style.display = 'none';
+        if (loop) cancelAnimationFrame(loop);
         loop = requestAnimationFrame(game);
     }
     
     const keys = {};
-    document.addEventListener('keydown', e => { if(['ArrowLeft','ArrowRight'].includes(e.key)) { e.preventDefault(); keys[e.key]=true; }});
-    document.addEventListener('keyup', e => keys[e.key]=false);
+    
+    const keyHandler = (e) => {
+        if(['ArrowLeft','ArrowRight'].includes(e.key)) {
+            e.preventDefault();
+            keys[e.key] = e.type === 'keydown';
+        }
+    };
+    
+    document.removeEventListener('keydown', window._soccerKeyHandler);
+    document.removeEventListener('keyup', window._soccerKeyHandler);
+    window._soccerKeyHandler = keyHandler;
+    document.addEventListener('keydown', keyHandler);
+    document.addEventListener('keyup', keyHandler);
     
     function game() {
+        if (!gameRunning) return;
+        
         if (keys['ArrowLeft'] && player.x>player.r) player.x -= 5;
         if (keys['ArrowRight'] && player.x<canvas.width-player.r) player.x += 5;
         
@@ -950,8 +1062,10 @@ function initSoccer(container) {
         }
         
         if (ball.y > canvas.height) {
+            gameRunning = false;
+            document.getElementById('soccerFinalScore').textContent = score;
+            document.getElementById('soccerOverlay').style.display = 'block';
             cancelAnimationFrame(loop);
-            alert('Game Over! Score: ' + score);
             return;
         }
         
@@ -980,6 +1094,7 @@ function initSoccer(container) {
         loop = requestAnimationFrame(game);
     }
     
+    document.getElementById('soccerRestart').addEventListener('click', reset);
     reset();
 }
 
@@ -987,15 +1102,20 @@ function initChess(container) {
     container.innerHTML = `
         <style>
             .chess-container { text-align: center; }
+            .chess-status { color: #fff; font-size: 16px; margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 8px; }
             .chess-board { display: grid; grid-template-columns: repeat(8, 40px); gap: 0; justify-content: center; border: 3px solid #8B4513; }
             .chess-cell { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 28px; cursor: pointer; }
             .chess-cell.light { background: #f0d9b5; }
             .chess-cell.dark { background: #b58863; }
             .chess-cell.selected { background: #7fff00 !important; }
+            .chess-cell.valid-move { background: #ffff00 !important; }
+            .chess-cell.last-move { box-shadow: inset 0 0 0 3px #00b894; }
+            .chess-turn { color: #f1c40f; font-weight: bold; }
         </style>
         <div class="chess-container">
+            <div class="chess-status">Turn: <span id="chessTurn" class="chess-turn">White ♔</span></div>
             <div class="chess-board" id="chessBoard"></div>
-            <p style="color:#fff;margin-top:15px;">Click a piece then click destination</p>
+            <div class="chess-status" id="chessMessage" style="margin-top:10px;"></div>
         </div>
     `;
     
@@ -1014,7 +1134,99 @@ function initChess(container) {
         ['P','P','P','P','P','P','P','P'],
         ['R','N','B','Q','K','B','N','R']
     ];
+    
     let selected = null;
+    let whiteTurn = true;
+    let lastMove = null;
+    let validMoves = [];
+    
+    function isWhite(piece) { return piece && piece === piece.toUpperCase(); }
+    function isBlack(piece) { return piece && piece === piece.toLowerCase(); }
+    function isEnemy(piece, isWhiteTurn) { return isWhiteTurn ? isBlack(piece) : isWhite(piece); }
+    
+    function getValidMoves(r, c) {
+        const piece = board[r][c];
+        if (!piece) return [];
+        
+        const moves = [];
+        const white = isWhite(piece);
+        const type = piece.toLowerCase();
+        
+        const addMove = (nr, nc) => {
+            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                const target = board[nr][nc];
+                if (!target || isEnemy(target, white)) {
+                    moves.push({r: nr, c: nc});
+                }
+            }
+        };
+        
+        const addLineMove = (dr, dc) => {
+            for (let i = 1; i < 8; i++) {
+                const nr = r + dr * i, nc = c + dc * i;
+                if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+                const target = board[nr][nc];
+                if (!target) {
+                    moves.push({r: nr, c: nc});
+                } else if (isEnemy(target, white)) {
+                    moves.push({r: nr, c: nc});
+                    break;
+                } else {
+                    break;
+                }
+            }
+        };
+        
+        switch (type) {
+            case 'p': // Pawn
+                const dir = white ? -1 : 1;
+                const startRow = white ? 6 : 1;
+                // Forward move
+                if (!board[r + dir]?.[c]) {
+                    moves.push({r: r + dir, c});
+                    // Double move from start
+                    if (r === startRow && !board[r + 2 * dir]?.[c]) {
+                        moves.push({r: r + 2 * dir, c});
+                    }
+                }
+                // Capture
+                for (const dc of [-1, 1]) {
+                    const nr = r + dir, nc = c + dc;
+                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                        if (isEnemy(board[nr][nc], white)) {
+                            moves.push({r: nr, c: nc});
+                        }
+                    }
+                }
+                break;
+                
+            case 'r': // Rook
+                for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) addLineMove(dr, dc);
+                break;
+                
+            case 'n': // Knight
+                for (const [dr, dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) {
+                    addMove(r + dr, c + dc);
+                }
+                break;
+                
+            case 'b': // Bishop
+                for (const [dr, dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) addLineMove(dr, dc);
+                break;
+                
+            case 'q': // Queen
+                for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]]) addLineMove(dr, dc);
+                break;
+                
+            case 'k': // King
+                for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+                    addMove(r + dr, c + dc);
+                }
+                break;
+        }
+        
+        return moves;
+    }
     
     function render() {
         const container = document.getElementById('chessBoard');
@@ -1025,7 +1237,13 @@ function initChess(container) {
                 const isLight = (r+c)%2===0;
                 const cell = document.createElement('div');
                 cell.className = `chess-cell ${isLight?'light':'dark'}`;
+                
                 if (selected && selected.r===r && selected.c===c) cell.classList.add('selected');
+                if (validMoves.some(m => m.r===r && m.c===c)) cell.classList.add('valid-move');
+                if (lastMove && ((lastMove.from.r===r && lastMove.from.c===c) || (lastMove.to.r===r && lastMove.to.c===c))) {
+                    cell.classList.add('last-move');
+                }
+                
                 cell.textContent = pieces[board[r][c]] || '';
                 cell.dataset.r = r;
                 cell.dataset.c = c;
@@ -1036,14 +1254,39 @@ function initChess(container) {
     }
     
     function click(r,c) {
-        if (selected) {
+        const piece = board[r][c];
+        
+        // If clicking on a valid move destination
+        if (selected && validMoves.some(m => m.r===r && m.c===c)) {
+            // Move the piece
             board[r][c] = board[selected.r][selected.c];
             board[selected.r][selected.c] = '';
+            
+            // Pawn promotion
+            if (board[r][c].toLowerCase() === 'p' && (r === 0 || r === 7)) {
+                board[r][c] = isWhite(board[r][c]) ? 'Q' : 'q';
+            }
+            
+            lastMove = {from: selected, to: {r, c}};
+            whiteTurn = !whiteTurn;
             selected = null;
-        } else if (board[r][c]) {
-            selected = {r,c};
+            validMoves = [];
+            document.getElementById('chessTurn').textContent = whiteTurn ? 'White ♔' : 'Black ♚';
+            document.getElementById('chessMessage').textContent = '';
+            render();
+            return;
         }
-        render();
+        
+        // If clicking on own piece, select it
+        if (piece && ((whiteTurn && isWhite(piece)) || (!whiteTurn && isBlack(piece)))) {
+            selected = {r, c};
+            validMoves = getValidMoves(r, c);
+            render();
+        } else {
+            selected = null;
+            validMoves = [];
+            render();
+        }
     }
     
     render();
