@@ -146,6 +146,22 @@ function showGameModal(game) {
     // Remove existing modal
     closeGameModal();
     
+    const needsTouchControls = ['snake', 'pong', 'breakout', 'flappy', 'asteroids', 'racing', 'soccer', '2048'];
+    const touchHTML = needsTouchControls.includes(game.id) ? `
+        <div class="touch-controls" id="touchControls">
+            <div class="touch-row">
+                <button class="touch-btn" data-key="ArrowUp">▲</button>
+            </div>
+            <div class="touch-row">
+                <button class="touch-btn" data-key="ArrowLeft">◀</button>
+                <button class="touch-btn" data-key="ArrowDown">▼</button>
+                <button class="touch-btn" data-key="ArrowRight">▶</button>
+            </div>
+            ${game.id === 'asteroids' ? '<button class="touch-btn action-btn" data-key="Space">🔥 FIRE</button>' : ''}
+            ${game.id === 'flappy' ? '<button class="touch-btn action-btn" data-key="Space">🪽 FLAP</button>' : ''}
+        </div>
+    ` : '';
+    
     const modal = document.createElement('div');
     modal.className = 'game-modal';
     modal.id = 'gameModal';
@@ -156,13 +172,17 @@ function showGameModal(game) {
                 <button class="close-modal" onclick="closeGameModal()">✕</button>
             </div>
             <div class="game-modal-body" id="gameModalBody"></div>
+            ${touchHTML}
             <div class="game-modal-controls">
-                <p><strong>Controls:</strong> ${game.controls}</p>
+                <p><strong>Controls:</strong> ${game.controls} | Touch buttons for mobile!</p>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+    
+    // Setup touch controls
+    setTimeout(() => setupTouchControls(), 150);
     
     // Close on backdrop click
     modal.addEventListener('click', (e) => {
@@ -175,6 +195,21 @@ function showGameModal(game) {
         if (initFunc) initFunc(body);
         else body.innerHTML = `<p style="color:#fff;text-align:center;padding:50px;">Game loading...</p>`;
     }, 100);
+}
+
+function setupTouchControls() {
+    document.querySelectorAll('.touch-btn').forEach(btn => {
+        const sendKey = (type) => {
+            const key = btn.dataset.key;
+            const event = new KeyboardEvent(type, { key, code: key, bubbles: true });
+            document.dispatchEvent(event);
+        };
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); sendKey('keydown'); });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); sendKey('keyup'); });
+        btn.addEventListener('mousedown', () => sendKey('keydown'));
+        btn.addEventListener('mouseup', () => sendKey('keyup'));
+        btn.addEventListener('mouseleave', () => sendKey('keyup'));
+    });
 }
 
 function closeGameModal() {
