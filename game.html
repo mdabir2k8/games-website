@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play game at GameZone">
+    <title>Play Game - GameZone</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>GameZone</span>
+            </a>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Game Container -->
+    <main class="game-page">
+        <div class="game-container">
+            <!-- Game Header -->
+            <div class="game-header">
+                <h1 id="gameTitle">Loading...</h1>
+                <div class="game-actions">
+                    <button class="action-btn" id="likeBtn" title="Add to Favorites">
+                        <i class="far fa-heart"></i>
+                        <span>Like</span>
+                    </button>
+                    <button class="action-btn" id="fullscreenBtn" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                        <span>Fullscreen</span>
+                    </button>
+                    <button class="action-btn" id="shareBtn" title="Share">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Iframe -->
+            <div class="game-frame-container" id="gameFrameContainer">
+                <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
+                <!-- Fullscreen overlay button -->
+                <button class="play-overlay" id="playOverlay">
+                    <i class="fas fa-play"></i>
+                    <span>Click to Play</span>
+                </button>
+            </div>
+
+            <!-- Game Info -->
+            <div class="game-info">
+                <div class="game-meta">
+                    <span class="game-category" id="gameCategory">
+                        <i class="fas fa-tag"></i> Category
+                    </span>
+                    <span class="game-plays" id="gamePlays">
+                        <i class="fas fa-users"></i> 0 plays
+                    </span>
+                    <span class="game-rating" id="gameRating">
+                        <i class="fas fa-star"></i> 4.5
+                    </span>
+                </div>
+                <p class="game-description" id="gameDescription">
+                    Loading game description...
+                </p>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <h3>How to Play</h3>
+                <p id="gameControls">Loading controls...</p>
+            </div>
+        </div>
+
+        <!-- Similar Games -->
+        <section class="similar-games">
+            <h2><i class="fas fa-gamepad"></i> Similar Games</h2>
+            <div class="games-grid" id="similarGames">
+                <!-- Loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Recently Played -->
+        <section class="recently-played">
+            <h2><i class="fas fa-history"></i> Recently Played</h2>
+            <div class="games-grid" id="recentGamesOnPage">
+                <!-- Loaded dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2024 GameZone. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Action completed!</span>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Game page specific code
+        document.addEventListener('DOMContentLoaded', () => {
+            initGamePage();
+        });
+    </script>
+</body>
+</html>

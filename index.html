@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play free online games at GameZone - The best collection of trending, popular and new games!">
+    <title>GameZone - Play Free Games Online</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>GameZone</span>
+            </a>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search games...">
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="#favorites" class="nav-link">
+                    <i class="fas fa-heart"></i>
+                    <span>Favorites</span>
+                </a>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Categories -->
+    <div class="categories-bar">
+        <div class="categories-container">
+            <button class="category-btn active" data-category="all">All Games</button>
+            <button class="category-btn" data-category="action">Action</button>
+            <button class="category-btn" data-category="puzzle">Puzzle</button>
+            <button class="category-btn" data-category="racing">Racing</button>
+            <button class="category-btn" data-category="sports">Sports</button>
+            <button class="category-btn" data-category="adventure">Adventure</button>
+            <button class="category-btn" data-category="multiplayer">Multiplayer</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to GameZone</h1>
+                <p>Play thousands of free online games. No downloads, no ads, just fun!</p>
+            </div>
+        </section>
+
+        <!-- Trending Games -->
+        <section class="games-section" id="trending">
+            <div class="section-header">
+                <h2><i class="fas fa-fire"></i> Trending Games</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="games-grid" id="trendingGames">
+                <!-- Games loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Popular Games -->
+        <section class="games-section" id="popular">
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> Popular Games</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="games-grid" id="popularGames">
+                <!-- Games loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- New Games -->
+        <section class="games-section" id="new">
+            <div class="section-header">
+                <h2><i class="fas fa-bolt"></i> New Games</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="games-grid" id="newGames">
+                <!-- Games loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Favorites Section -->
+        <section class="games-section" id="favorites">
+            <div class="section-header">
+                <h2><i class="fas fa-heart"></i> Your Favorites</h2>
+            </div>
+            <div class="games-grid" id="favoritesGames">
+                <div class="empty-state" id="emptyFavorites">
+                    <i class="fas fa-heart-broken"></i>
+                    <p>No favorites yet. Start adding games you love!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recently Played -->
+        <section class="games-section" id="recent">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Recently Played</h2>
+            </div>
+            <div class="games-grid" id="recentGames">
+                <div class="empty-state" id="emptyRecent">
+                    <i class="fas fa-gamepad"></i>
+                    <p>No games played yet. Start playing now!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Games -->
+        <section class="games-section" id="all-games">
+            <div class="section-header">
+                <h2><i class="fas fa-th"></i> All Games</h2>
+            </div>
+            <div class="games-grid" id="allGames">
+                <!-- Games loaded dynamically -->
+            </div>
+            <button class="load-more-btn" id="loadMoreBtn">
+                <i class="fas fa-plus"></i> Load More Games
+            </button>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-gamepad"></i>
+                    <span>GameZone</span>
+                </a>
+                <p>The best free online games platform. Play now!</p>
+            </div>
+            <div class="footer-links">
+                <h4>Categories</h4>
+                <a href="#">Action</a>
+                <a href="#">Puzzle</a>
+                <a href="#">Racing</a>
+                <a href="#">Sports</a>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="#">About Us</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 GameZone. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <p>Loading games...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

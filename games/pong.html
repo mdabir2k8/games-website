@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pong</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .container { text-align: center; }
+    h1 { color: #fff; margin-bottom: 20px; font-size: 48px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    .score { color: #fff; font-size: 24px; margin-bottom: 15px; }
+    canvas { 
+      background: #1a1a2e; 
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .btn { 
+      margin-top: 20px; 
+      padding: 12px 30px; 
+      font-size: 18px; 
+      background: #fff; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer;
+    }
+    .instructions { color: #fff; margin-top: 15px; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏓 Pong</h1>
+    <div class="score">Player: <span id="player">0</span> | Computer: <span id="computer">0</span></div>
+    <canvas id="game" width="600" height="400"></canvas>
+    <br>
+    <button class="btn" onclick="reset()">New Game</button>
+    <p class="instructions">Use ↑ ↓ arrow keys to move</p>
+  </div>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    
+    const paddle = { w: 10, h: 80 };
+    let player, computer, ball, playerScore, computerScore, gameLoop;
+    
+    function reset() {
+      player = { x: 20, y: canvas.height/2 - paddle.h/2 };
+      computer = { x: canvas.width - 30, y: canvas.height/2 - paddle.h/2 };
+      ball = { x: canvas.width/2, y: canvas.height/2, vx: 5, vy: 3, r: 8 };
+      playerScore = 0;
+      computerScore = 0;
+      updateScore();
+      if (gameLoop) cancelAnimationFrame(gameLoop);
+      game();
+    }
+    
+    function updateScore() {
+      document.getElementById('player').textContent = playerScore;
+      document.getElementById('computer').textContent = computerScore;
+    }
+    
+    const keys = {};
+    document.addEventListener('keydown', e => keys[e.key] = true);
+    document.addEventListener('keyup', e => keys[e.key] = false);
+    
+    function game() {
+      // Player movement
+      if (keys['ArrowUp'] && player.y > 0) player.y -= 6;
+      if (keys['ArrowDown'] && player.y < canvas.height - paddle.h) player.y += 6;
+      
+      // Computer AI
+      const target = ball.y - paddle.h/2;
+      if (computer.y < target && computer.y < canvas.height - paddle.h) computer.y += 4;
+      if (computer.y > target && computer.y > 0) computer.y -= 4;
+      
+      // Ball movement
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      
+      // Wall bounce
+      if (ball.y < ball.r || ball.y > canvas.height - ball.r) ball.vy *= -1;
+      
+      // Paddle collision
+      if (ball.x - ball.r < player.x + paddle.w && ball.y > player.y && ball.y < player.y + paddle.h) {
+        ball.vx *= -1.05;
+        ball.x = player.x + paddle.w + ball.r;
+      }
+      if (ball.x + ball.r > computer.x && ball.y > computer.y && ball.y < computer.y + paddle.h) {
+        ball.vx *= -1.05;
+        ball.x = computer.x - ball.r;
+      }
+      
+      // Score
+      if (ball.x < 0) { computerScore++; updateScore(); resetBall(); }
+      if (ball.x > canvas.width) { playerScore++; updateScore(); resetBall(); }
+      
+      // Draw
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.setLineDash([10, 10]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.beginPath();
+      ctx.moveTo(canvas.width/2, 0);
+      ctx.lineTo(canvas.width/2, canvas.height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(player.x, player.y, paddle.w, paddle.h);
+      ctx.fillRect(computer.x, computer.y, paddle.w, paddle.h);
+      
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fill();
+      
+      gameLoop = requestAnimationFrame(game);
+    }
+    
+    function resetBall() {
+      ball.x = canvas.width/2;
+      ball.y = canvas.height/2;
+      ball.vx = (Math.random() > 0.5 ? 5 : -5);
+      ball.vy = (Math.random() - 0.5) * 6;
+    }
+    
+    reset();
+  </script>
+</body>
+</html>
