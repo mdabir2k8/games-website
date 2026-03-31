@@ -6,10 +6,18 @@
     <meta name="description" content="Play free online games at GameZone - The best collection of trending, popular and new games!">
     <title>GameZone - Play Free Games Online</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-shapes">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
@@ -21,15 +29,20 @@
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Search games...">
+                <div class="search-results" id="searchResults"></div>
             </div>
             
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
                     <i class="fas fa-moon"></i>
                 </button>
-                <a href="#favorites" class="nav-link">
+                <button class="sound-toggle" id="soundToggle" title="Toggle Sound">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <a href="#favorites" class="nav-link" id="navFavorites">
                     <i class="fas fa-heart"></i>
                     <span>Favorites</span>
+                    <span class="fav-count" id="favCount">0</span>
                 </a>
             </div>
             
@@ -37,18 +50,40 @@
                 <i class="fas fa-bars"></i>
             </button>
         </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#trending" class="mobile-link"><i class="fas fa-fire"></i> Trending</a>
+            <a href="#popular" class="mobile-link"><i class="fas fa-star"></i> Popular</a>
+            <a href="#favorites" class="mobile-link"><i class="fas fa-heart"></i> Favorites</a>
+            <a href="#recent" class="mobile-link"><i class="fas fa-history"></i> Recent</a>
+        </div>
     </nav>
 
     <!-- Categories -->
     <div class="categories-bar">
         <div class="categories-container">
-            <button class="category-btn active" data-category="all">All Games</button>
-            <button class="category-btn" data-category="action">Action</button>
-            <button class="category-btn" data-category="puzzle">Puzzle</button>
-            <button class="category-btn" data-category="racing">Racing</button>
-            <button class="category-btn" data-category="sports">Sports</button>
-            <button class="category-btn" data-category="adventure">Adventure</button>
-            <button class="category-btn" data-category="multiplayer">Multiplayer</button>
+            <button class="category-btn active" data-category="all">
+                <i class="fas fa-th"></i> All
+            </button>
+            <button class="category-btn" data-category="action">
+                <i class="fas fa-bolt"></i> Action
+            </button>
+            <button class="category-btn" data-category="puzzle">
+                <i class="fas fa-puzzle-piece"></i> Puzzle
+            </button>
+            <button class="category-btn" data-category="racing">
+                <i class="fas fa-car"></i> Racing
+            </button>
+            <button class="category-btn" data-category="sports">
+                <i class="fas fa-futbol"></i> Sports
+            </button>
+            <button class="category-btn" data-category="adventure">
+                <i class="fas fa-compass"></i> Adventure
+            </button>
+            <button class="category-btn" data-category="multiplayer">
+                <i class="fas fa-users"></i> Multiplayer
+            </button>
         </div>
     </div>
 
@@ -57,8 +92,25 @@
         <!-- Hero Section -->
         <section class="hero">
             <div class="hero-content">
-                <h1>Welcome to GameZone</h1>
-                <p>Play thousands of free online games. No downloads, no ads, just fun!</p>
+                <h1 class="glitch" data-text="Welcome to GameZone">Welcome to GameZone</h1>
+                <p>Play thousands of free online games. No downloads, no ads, just pure fun!</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <i class="fas fa-gamepad"></i>
+                        <span class="stat-number" id="totalGames">12</span>
+                        <span class="stat-label">Games</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-users"></i>
+                        <span class="stat-number" id="totalPlays">20M+</span>
+                        <span class="stat-label">Plays</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-trophy"></i>
+                        <span class="stat-number">Free</span>
+                        <span class="stat-label">Forever</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -66,9 +118,9 @@
         <section class="games-section" id="trending">
             <div class="section-header">
                 <h2><i class="fas fa-fire"></i> Trending Games</h2>
-                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+                <a href="#all-games" class="see-all" data-filter="trending">See All <i class="fas fa-arrow-right"></i></a>
             </div>
-            <div class="games-grid" id="trendingGames">
+            <div class="games-slider" id="trendingGames">
                 <!-- Games loaded dynamically -->
             </div>
         </section>
@@ -77,9 +129,9 @@
         <section class="games-section" id="popular">
             <div class="section-header">
                 <h2><i class="fas fa-star"></i> Popular Games</h2>
-                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+                <a href="#all-games" class="see-all" data-filter="popular">See All <i class="fas fa-arrow-right"></i></a>
             </div>
-            <div class="games-grid" id="popularGames">
+            <div class="games-slider" id="popularGames">
                 <!-- Games loaded dynamically -->
             </div>
         </section>
@@ -88,9 +140,9 @@
         <section class="games-section" id="new">
             <div class="section-header">
                 <h2><i class="fas fa-bolt"></i> New Games</h2>
-                <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+                <a href="#all-games" class="see-all" data-filter="new">See All <i class="fas fa-arrow-right"></i></a>
             </div>
-            <div class="games-grid" id="newGames">
+            <div class="games-slider" id="newGames">
                 <!-- Games loaded dynamically -->
             </div>
         </section>
@@ -99,11 +151,14 @@
         <section class="games-section" id="favorites">
             <div class="section-header">
                 <h2><i class="fas fa-heart"></i> Your Favorites</h2>
+                <button class="clear-btn" id="clearFavorites" style="display:none;">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
             </div>
             <div class="games-grid" id="favoritesGames">
                 <div class="empty-state" id="emptyFavorites">
                     <i class="fas fa-heart-broken"></i>
-                    <p>No favorites yet. Start adding games you love!</p>
+                    <p>No favorites yet. Click the <i class="fas fa-heart"></i> on any game to add it!</p>
                 </div>
             </div>
         </section>
@@ -112,6 +167,9 @@
         <section class="games-section" id="recent">
             <div class="section-header">
                 <h2><i class="fas fa-history"></i> Recently Played</h2>
+                <button class="clear-btn" id="clearRecent" style="display:none;">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
             </div>
             <div class="games-grid" id="recentGames">
                 <div class="empty-state" id="emptyRecent">
@@ -121,17 +179,35 @@
             </div>
         </section>
 
+        <!-- High Scores -->
+        <section class="games-section" id="highscores">
+            <div class="section-header">
+                <h2><i class="fas fa-trophy"></i> Your High Scores</h2>
+            </div>
+            <div class="highscores-grid" id="highScoresGrid">
+                <div class="empty-state" id="emptyHighScores">
+                    <i class="fas fa-medal"></i>
+                    <p>Play games to set high scores!</p>
+                </div>
+            </div>
+        </section>
+
         <!-- All Games -->
         <section class="games-section" id="all-games">
             <div class="section-header">
                 <h2><i class="fas fa-th"></i> All Games</h2>
+                <div class="sort-options">
+                    <select id="sortGames">
+                        <option value="default">Default</option>
+                        <option value="name">Name (A-Z)</option>
+                        <option value="rating">Top Rated</option>
+                        <option value="plays">Most Played</option>
+                    </select>
+                </div>
             </div>
             <div class="games-grid" id="allGames">
                 <!-- Games loaded dynamically -->
             </div>
-            <button class="load-more-btn" id="loadMoreBtn">
-                <i class="fas fa-plus"></i> Load More Games
-            </button>
         </section>
     </main>
 
@@ -143,34 +219,54 @@
                     <i class="fas fa-gamepad"></i>
                     <span>GameZone</span>
                 </a>
-                <p>The best free online games platform. Play now!</p>
-            </div>
-            <div class="footer-links">
-                <h4>Categories</h4>
-                <a href="#">Action</a>
-                <a href="#">Puzzle</a>
-                <a href="#">Racing</a>
-                <a href="#">Sports</a>
+                <p>The best free online games platform. Play now, have fun!</p>
+                <div class="social-links">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="Discord"><i class="fab fa-discord"></i></a>
+                </div>
             </div>
             <div class="footer-links">
                 <h4>Quick Links</h4>
-                <a href="#">About Us</a>
-                <a href="#">Contact</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <a href="#" id="linkAbout"><i class="fas fa-info-circle"></i> About Us</a>
+                <a href="#" id="linkContact"><i class="fas fa-envelope"></i> Contact</a>
+                <a href="#" id="linkPrivacy"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                <a href="#" id="linkTerms"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            </div>
+            <div class="footer-links">
+                <h4>Categories</h4>
+                <a href="#" class="cat-link" data-cat="action"><i class="fas fa-bolt"></i> Action</a>
+                <a href="#" class="cat-link" data-cat="puzzle"><i class="fas fa-puzzle-piece"></i> Puzzle</a>
+                <a href="#" class="cat-link" data-cat="racing"><i class="fas fa-car"></i> Racing</a>
+                <a href="#" class="cat-link" data-cat="sports"><i class="fas fa-futbol"></i> Sports</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 GameZone. All rights reserved.</p>
+            <p>&copy; 2024 GameZone. All rights reserved. Made with <i class="fas fa-heart" style="color:#e74c3c"></i></p>
         </div>
     </footer>
+
+    <!-- Info Modal -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-modal-content">
+            <button class="close-info-modal" id="closeInfoModal">&times;</button>
+            <div class="info-modal-body" id="infoModalBody"></div>
+        </div>
+    </div>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loader">
             <div class="loader-circle"></div>
-            <p>Loading games...</p>
+            <div class="loader-text">Loading games...</div>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success!</span>
     </div>
 
     <script src="script.js"></script>
